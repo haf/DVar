@@ -12,12 +12,9 @@ Albacore::Tasks::Versionizer.new :versioning
 
 desc 'create assembly infos'
 asmver_files :assembly_info do |a|
-  a.files = FileList['**/*proj'] # optional, will find all projects recursively by default
-
-  a.attributes assembly_description: 'TODO',
+  a.files = FileList['./src/DVar/*.fsproj']
+  a.attributes assembly_description: 'A functional way to configure functions',
                assembly_configuration: Configuration,
-               assembly_company: 'Foretag AB',
-               assembly_copyright: "(c) 2016 by John Doe",
                assembly_version: ENV['LONG_VERSION'],
                assembly_file_version: ENV['LONG_VERSION'],
                assembly_informational_version: ENV['BUILD_VERSION']
@@ -26,7 +23,7 @@ end
 desc 'Perform fast build (warn: doesn\'t d/l deps)'
 build :quick_compile do |b|
   b.prop 'Configuration', Configuration
-  b.sln     = 'src/DVar/DVar.fsproj'
+  b.sln = 'src/DVar/DVar.fsproj'
 end
 
 task :paket_bootstrap do
@@ -58,7 +55,7 @@ title #{p.id}
 authors #{authors}
 owners #{authors}
 tags dvar configuration config
-description A primitive for flowing configuration
+description A functional way of configuring functions
 language en-GB
 copyright #{authors}
 licenseUrl https://www.apache.org/licenses/LICENSE-2.0.html
