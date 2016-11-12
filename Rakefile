@@ -5,6 +5,7 @@ require 'albacore/tasks/versionizer'
 require 'albacore/task_types/nugets_pack'
 require './tools/paket_pack'
 include ::Albacore::NugetsPack
+require 'semver'
 
 Configuration = ENV['CONFIGURATION'] || 'Release'
 
@@ -80,8 +81,24 @@ dependencies
   end
 end
 
+desc 'Create DVar nugets packages'
+task :pack do
+  Dir.chdir 'src/DVar'  do
+    system 'dotnet', %W|--verbose pack --configuration #{Configuration}|
+  end
+end
+
+task :merge_quick => :pack do
+  Dir.chdir 'src/DVar'  do
+    version = SemVer.find.format("%M.%m.%p%s")
+    sourcenupkg = "../../build/pkg/DVar.#{version}.nupkg"
+    clinupkg = "bin/#{Configuration}/DVar.#{version}-dotnetcli.nupkg"
+    system 'dotnet', %W|mergenupkg --source "#{sourcenupkg}" --other "#{clinupkg}" --framework netstandard1.6|
+  end
+end
+
 desc 'Build nuget packages'
-task :create_nugets => [:versioning, 'build/pkg', :compile, :create_nugets_quick]
+task :create_nugets => [:versioning, 'build/pkg', :compile, :create_nugets_quick] #, :merge_quick]
 
 namespace :tests do
   #task :unit do

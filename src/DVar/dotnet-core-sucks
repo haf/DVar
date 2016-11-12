@@ -1,5 +1,5 @@
 {
-     "version": "0.1.0-*",
+     "version": "0.1.0-dotnetcli",
      "buildOptions": {
          "compilerName": "fsc",
          "compile": {
@@ -24,7 +24,10 @@
     "frameworks": {
         "net461": {},
         "netstandard1.6": {
-             "imports": "dnxcore50"
+           "imports": [
+             "dnxcore50",
+             "portable-net45+win8"
+           ]
         }
     }
 }
