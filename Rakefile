@@ -90,9 +90,9 @@ end
 
 task :default => :create_nugets #, :tests ]
 
-#task :ensure_nuget_key do
-#  raise 'missing env NUGET_KEY value' unless ENV['NUGET_KEY']
-#end
+task :ensure_nuget_key do
+  raise 'missing env NUGET_KEY value' unless ENV['NUGET_KEY']
+end
 
 Albacore::Tasks::Release.new :release,
                              pkg_dir: 'build/pkg',
