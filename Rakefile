@@ -40,7 +40,8 @@ task :compile => [:versioning, :restore, :assembly_info, :quick_compile]
 
 directory 'build/pkg'
 
-task :create_nugets => [:versioning, 'build/pkg'] do
+
+task :create_nugets_quick do
   projects = FileList['src/**/*.fsproj']
   knowns = Set.new(projects.map { |f| Albacore::Project.new f }.map { |p| p.id })
   authors = "https://twitter.com/eulerfx"
@@ -79,6 +80,8 @@ dependencies
   end
 end
 
+desc 'Build nuget packages'
+task :create_nugets => [:versioning, 'build/pkg', :compile, :create_nugets_quick]
 
 namespace :tests do
   #task :unit do
