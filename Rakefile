@@ -13,7 +13,7 @@ Albacore::Tasks::Versionizer.new :versioning
 
 desc 'create assembly infos'
 asmver_files :assembly_info do |a|
-  a.files = FileList['./src/DVar/*.fsproj']
+  a.files = FileList['./src/**/*.fsproj']
   a.attributes assembly_description: 'A functional way to configure functions',
                assembly_configuration: Configuration,
                assembly_version: ENV['LONG_VERSION'],
@@ -24,7 +24,7 @@ end
 desc 'Perform fast build (warn: doesn\'t d/l deps)'
 build :quick_compile do |b|
   b.prop 'Configuration', Configuration
-  b.sln = 'src/DVar/DVar.fsproj'
+  b.sln = 'src/DVar.Tests/DVar.Tests.fsproj'
 end
 
 task :paket_bootstrap do
@@ -41,9 +41,8 @@ task :compile => [:versioning, :restore, :assembly_info, :quick_compile]
 
 directory 'build/pkg'
 
-
 task :create_nugets_quick do
-  projects = FileList['src/**/*.fsproj']
+  projects = FileList['src/**/*.fsproj'].exclude(/Tests/)
   knowns = Set.new(projects.map { |f| Albacore::Project.new f }.map { |p| p.id })
   authors = "https://twitter.com/eulerfx"
   projects.each do |f|
@@ -64,7 +63,7 @@ licenseUrl https://www.apache.org/licenses/LICENSE-2.0.html
 projectUrl https://github.com/haf/dvar
 iconUrl https://raw.githubusercontent.com/haf/dvar/master/tools/logo.png
 files
-  #{p.proj_path_base}/#{p.output_dll Configuration} ==\> lib/net461
+  #{p.proj_path_base}/#{p.output_dll Configuration} ==\> lib/net452
 releaseNotes
   #{n.metadata.release_notes.each_line.reject{|x| x.strip == ""}.join}
 dependencies
@@ -101,14 +100,14 @@ desc 'Build nuget packages'
 task :create_nugets => [:versioning, 'build/pkg', :compile, :create_nugets_quick] #, :merge_quick]
 
 namespace :tests do
-  #task :unit do
-  #  system "src/MyProj.Tests/bin/#{Configuration}/MyProj.Tests.exe", clr_command: true
-  #end
+  task :unit do
+    system "src/DVar.Tests/bin/#{Configuration}/DVar.Tests.exe", clr_command: true
+  end
 end
 
-# task :tests => :'tests:unit'
+task :tests => :'tests:unit'
 
-task :default => :create_nugets #, :tests ]
+task :default => [:compile, :tests, :create_nugets]
 
 task :ensure_nuget_key do
   raise 'missing env NUGET_KEY value' unless ENV['NUGET_KEY']
